@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Ticket Creator
 // @namespace    https://github.com/AZAOWEN2/Ticket-Creator
-// @version      1.0.0
+// @version      1.0.1
 // @description  Yesthing
 // @author       AZAOWEN
 // @match        https://*.vnpt.vn/*
@@ -252,6 +252,7 @@
 
         // Fill Description
         const DESCRIPTION = document.querySelector(".richtext-content");
+        if (!DESCRIPTION || DESCRIPTION.classList.contains("pmtrung-data-filled")) return;
         const DESCRIPTION_DATA = TICKET_DESCRIPTION_TEMPLATES(data, additionalData, site);
         DESCRIPTION_DATA.forEach(block => {
             if (block.includes('\n')) {
@@ -272,6 +273,8 @@
         img.style.width = "1000px";
         img.style.maxWidth = "100%";
         DESCRIPTION.appendChild(img);
+
+        DESCRIPTION.classList.add("pmtrung-data-filled");
 
         otherInformation(site, data, classify(data.EventID));
         storeCleanUp();
@@ -476,7 +479,7 @@
                 group: ["Access"]
             },
             {
-                ids: ["4625", "SSHD_LOGIN_FAILED", "77001"],
+                ids: ["4625", "SSHD_LOGIN_FAILED", "77001", "LOGIN_FAILED"],
                 type: 6, //Login Failed 
                 group: ["Access"]
             },
