@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Ticket Creator
 // @namespace    https://github.com/AZAOWEN2/Ticket-Creator
-// @version      1.0.1
+// @version      1.0.2
 // @description  Yesthing
 // @author       AZAOWEN
 // @match        https://*.vnpt.vn/*
@@ -17,6 +17,9 @@
 // @grant        GM_addValueChangeListener
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
+
+// @updateURL   https://raw.githubusercontent.com/AZAOWEN2/Ticket-Creator/main/main.user.js
+// @downloadURL https://raw.githubusercontent.com/AZAOWEN2/Ticket-Creator/main/main.user.js
 // ==/UserScript==
 
 (function() {
