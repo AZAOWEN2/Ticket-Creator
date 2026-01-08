@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Ticket Creator
+// @name         Ticket Creator (Beta)
 // @namespace    https://github.com/AZAOWEN2/Ticket-Creator
 // @version      1.0.2
 // @description  Yesthing
