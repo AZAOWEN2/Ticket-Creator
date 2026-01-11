@@ -1,13 +1,15 @@
 // ==UserScript==
 // @name         Ticket Creator (Beta)
 // @namespace    https://github.com/AZAOWEN2/Ticket-Creator
-// @version      1.0.2
+// @version      1.0.3
 // @description  Yesthing
 // @author       AZAOWEN
+// @icon         https://i.pinimg.com/736x/e9/f6/36/e9f63675fa85770c13c3d726f3313a37.jpg
 // @match        https://*.vnpt.vn/*
 // @resource     STYLE https://cdn.jsdelivr.net/gh/AZAOWEN2/Ticket-Creator@main/style.css
-// @require      https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js
+// @require      https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.13/html-to-image.min.js
 // @connect      cdn.jsdelivr.net
+// @connect      raw.githubusercontent.com
 
 // @grant        GM_setValue
 // @grant        GM_getValue
@@ -18,8 +20,8 @@
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
 
-// @updateURL   https://raw.githubusercontent.com/AZAOWEN2/Ticket-Creator/main/main.user.js
-// @downloadURL https://raw.githubusercontent.com/AZAOWEN2/Ticket-Creator/main/main.user.js
+// @updateURL    https://cdn.jsdelivr.net/gh/AZAOWEN2/Ticket-Creator@main/main.user.js
+// @downloadURL  https://cdn.jsdelivr.net/gh/AZAOWEN2/Ticket-Creator@main/main.user.js
 // ==/UserScript==
 
 (function() {
@@ -64,7 +66,6 @@
     observeCenter(".newTicket", (el) => {
         if(!(typeof GM_getValue("pmtrung-ticket") === 'undefined' || GM_getValue("pmtrung-ticket") === null) && Date.now() - GM_getValue("pmtrung-ticket") < 10000){
             recieveTicketData();
-            insertNotification();
         }else{
             storeCleanUp();
         }
@@ -125,10 +126,10 @@
         const additionalData = {
             Command:            collectTicketData(["Process Command Line", "Scriptblock Text", "Host Application", "Command Arguments", "Command"], eventInformation[0].nextElementSibling),
             ParentCommand:      collectTicketData("Parent Process Command Line", eventInformation[0].nextElementSibling),
-            Hash:               collectTicketData(["MD5 Hash","IMP Hash","SHA1 Hash","SHA256 Hash"], eventInformation[0].nextElementSibling),
+            Hash:               collectTicketData(["Hash File","MD5 Hash","IMP Hash","SHA1 Hash","SHA256 Hash"], eventInformation[0].nextElementSibling),
             Process:            collectTicketData(["Process Name", "Process Path"], eventInformation[0].nextElementSibling),
             ParentProcess:      collectTicketData("Parent Process Name", eventInformation[0].nextElementSibling),
-            File:               collectTicketData(["File Path", "Object Name"], eventInformation[0].nextElementSibling),
+            File:               collectTicketData(["File Path", "Object Name", "Audit Name"], eventInformation[0].nextElementSibling),
             ServiceName:        collectTicketData("Service Name", eventInformation[0].nextElementSibling),
             ServiceFileName:    collectTicketData(["Service File Name", "Service Filename"], eventInformation[0].nextElementSibling),
             DNSQuery:           collectTicketData(["Query Name", "URL Host"], eventInformation[0].nextElementSibling),
@@ -136,57 +137,55 @@
             Username:           collectTicketData("Username", eventInformation[0].nextElementSibling),
             TargetUsername:     collectTicketData(["User Account", "Target Username", "Username"], eventInformation[0].nextElementSibling),
             ComputerName:       collectTicketData(["Machine Identifier", "Caller Computer Name"], eventInformation[0].nextElementSibling),
+            EvilFile:           collectTicketData(["KSC_Malware_Object", "test-parse", "Object"], eventInformation[0].nextElementSibling),
         }
 
         sendTicketData(data, additionalData);
     }
 
-    function screenshot(){
+
+    function screenshot() {
         const startNode = PAGE_EVENTVIEWER.querySelector("#SourceDestinationHeader");
         const endNode = PAGE_EVENTVIEWER.querySelectorAll("#EventHeader")[1].nextElementSibling.querySelector("tbody > tr:nth-child(2)");
 
         const wrapper = document.createElement('div');
         wrapper.classList.add('pmtrung-screenshot-wrapper');
+        
         wrapper.style.width = startNode.parentElement ? startNode.parentElement.offsetWidth + "px" : "100%";
+
 
         if (startNode && endNode) {
             const range = document.createRange();
-        
             range.setStartBefore(startNode);
-            
             range.setEndAfter(endNode);
-            
             const fragment = range.cloneContents();
             wrapper.appendChild(fragment);
         } else {
             console.error("Không tìm thấy node đầu hoặc node cuối!");
-            return;
         }
 
-        PAGE_EVENTVIEWER.body.appendChild(wrapper);
+
+        PAGE_EVENTVIEWER.querySelector("#scrollingDiv").appendChild(wrapper);
 
 
-        return html2canvas(wrapper, { useCORS: true, allowTaint: true })
-            .then(canvas => {
-                try {
-                    const base64Image = canvas.toDataURL("image/png");
-
-                    PAGE_EVENTVIEWER.body.removeChild(wrapper);
-
-                    console.log("Chụp ảnh thành công."+ base64Image.length);
-                    return base64Image;
-
-                } catch (e) {
-                    console.error("Lỗi khi lưu GM:", e);
-                    if(PAGE_EVENTVIEWER.body.contains(wrapper)) PAGE_EVENTVIEWER.body.removeChild(wrapper);
-                }
+        return htmlToImage.toPng(wrapper, {
+                backgroundColor: '#fff',
+                filter: (node) => { return (node.tagName !== 'SCRIPT'); },
+                skipFonts: true,
+                cacheBust: true
+            })
+            .then(dataUrl => {
+                return dataUrl;
             })
             .catch(err => {
-                if(PAGE_EVENTVIEWER.body.contains(wrapper)) PAGE_EVENTVIEWER.body.removeChild(wrapper);          
-                console.log("Lỗi chụp ảnh: " + err);
-                // GM_deleteValue("pmtrung-ticket-screenshot");
-        });
-        
+                console.error("Lỗi chụp ảnh:", err);
+                return null;
+            })
+            .finally(() => {
+                if (PAGE_EVENTVIEWER.querySelector("#scrollingDiv").contains(wrapper)) {
+                    PAGE_EVENTVIEWER.querySelector("#scrollingDiv").removeChild(wrapper);
+                }
+            });
     }
 
     function collectTicketData(searchData, searchScope = document) {
@@ -219,11 +218,9 @@
         GM_setValue("pmtrung-ticket-additional-data", additionalData);
 
         if(window.location.hostname === "siem.vnpt.vn"){
-            // GM_openInTab("https://ticket.vnpt.vn/#ticket/create/id/", { active: true });
-            window.open("https://ticket.vnpt.vn/#ticket/create/id/", "_blank");
+            GM_openInTab("https://ticket.vnpt.vn/#ticket/create/id/", { active: true });
         }else{
-            // GM_openInTab("https://dashboard-soc.vnpt.vn/ticket/#ticket/create/id/", { active: true });
-            window.open("https://dashboard-soc.vnpt.vn/ticket/#ticket/create/id/", "_blank");
+            GM_openInTab("https://dashboard-soc.vnpt.vn/ticket/#ticket/create/id/", { active: true });
         }
         
     }
@@ -301,6 +298,7 @@
             6: `Phát hiện hành vi xác thực sai liên tục nghi ngờ tấn công Bruteforce`,
             7: `Xác minh hành vi create account`,
             8: (data.LogonType === '10') || (data.EventID === '1149') ? "Xác minh hành vi đăng nhập thông qua RDP" : "Xác minh hành vi đăng nhập thành công",
+            9: `Phát hiện thiết bị có dấu hiệu nhiễm mã độc`,
         };
 
         const specificMessage = messages[eventType] || "";
@@ -324,6 +322,8 @@
                 8: (data.LogonType === '10') || (data.EventID === '1149') 
                     ? `${subject} phát hiện IP ${data.SourceIP} thực hiện hành vi đăng nhập RDP trên máy chủ của ${data.Domain}.` 
                     : `${subject} ghi nhận hành vi đăng nhập thành công từ ${data.SourceIP}`,
+                9: `${subject} phát hiện thiết bị chứa file nghi ngờ là mã độc
+                    Nguồn phát hiện: KAS`,
                 "default": `${subject} ghi nhận hành vi bất thường`,
             },
             p2: `Log Source: ${data.LogSource}`,
@@ -342,6 +342,8 @@
                 8: `Destination IP: ${data.DestinationIP}
                     Username: ${additionalData.TargetUsername}
                     ${/^(10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/.test(data.SourceIP) ? "" : "Việc cho phép IP public RDP vào server tiềm ẩn rất nhiều rủi ro cho hệ thống."}`,
+                9: `File Path: ${additionalData.EvilFile == "" || additionalData.EvilFile == "N/A" ? `Chi tiết trong ảnh đính kèm` : `additionalData.EvilFile`}
+                    ${additionalData.Hash == "" || additionalData.Hash == "N/A" ? "": `Hash: ` + additionalData.Hash }`,
                 "default": ``
             },
             p5: `Time: ${data.Time}`,
@@ -391,6 +393,14 @@
                     + Nếu không phải nghiệp vụ, ${/^(10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/.test(data.SourceIP) ? "thực hiện ngắt kết nối mạng, cô lập thiết bị" : `đề nghị chặn IP ${data.SourceIP}`}  và thực hiện đổi mật khẩu tài khoản "${additionalData.TargetUsername}".
                     ${((data.LogonType === '10') || (data.EventID === '1149') && !/^(10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/.test(data.SourceIP)) ? `+ Đóng các cổng kết nối cho phép RDP từ ngoài vào.`: ""}
                     + Phản hồi lại kết quả xử lý với ${subject_short}.`,
+
+                9: `+ Xác minh nghiệp vụ file trên.
+                    + Nếu không phải nghiệp vụ, thực hiện cô lập hệ thống để rà soát.
+                    + Rà soát, gỡ bỏ các tiến trình độc hại, lập lịch của attacker, chặn các kết nối bất thường.
+                    + Thu thập mẫu mã độc và log hệ thống gửi về ${subject_short}.
+                    + Xóa các file mã độc (Nếu có).
+                    + Tiếp tục theo dõi hệ thống.
+                    + Gửi báo cáo xử lý chi tiết theo khuyến nghị lại cho ${subject_short}.`,
 
                 "default": `+ Xác minh hành vi trên.
                             + Gửi thông tin xác nhận lại cho ${subject_short}.`
@@ -462,7 +472,7 @@
                 group: ["Suspicious Activity", "client_server", "Các sự cố liên quan đến máy Client và Server"]
             },
             {
-                ids: ["11", "4663"],
+                ids: ["11", "4663", "PATH_CREATE"],
                 type: 2, //create file 
                 group: ["Suspicious Activity", "client_server", "Các sự cố liên quan đến máy Client và Server"]
             },
@@ -495,6 +505,11 @@
                 ids: ["1149", "4624"],
                 type: 8, //Login Success
                 group: ["Access"]
+            },
+            {
+                ids: ["GNRL_EV_VIRUS_FOUND 61", "GNRL_EV_OBJECT_CURED", "GNRL_EV_VIRUS_FOUND 60", "GNRL_EV_VIRUS_FOUND 62", "GNRL_EV_VIRUS_FOUND", "GNRL_EV_VIRUS_FOUND_AND_BLOCKED", "GNRL_EV_OBJECT_DELETED", "GNRL_EV_OBJECT_BLOCKED"],
+                type: 9, //Malware/Ransomware
+                group: ["Malware"]
             },
         ];
 
