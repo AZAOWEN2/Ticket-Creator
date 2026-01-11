@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Ticket Creator (Beta)
 // @namespace    https://github.com/AZAOWEN2/Ticket-Creator
-// @version      1.0.3
+// @version      1.0.4
 // @description  Yesthing
 // @author       AZAOWEN
 // @icon         https://i.pinimg.com/736x/e9/f6/36/e9f63675fa85770c13c3d726f3313a37.jpg
@@ -435,9 +435,9 @@
                 break;
             }
             case "mss":{
-                const group = document.querySelector('[data-name="group_id"]').nextElementSibling;
-                const groupSelection = group.querySelector(groupEvent.map(text => `[title*="${text}" i]`).join(", "));
-                if (groupSelection) groupSelection.click();
+                const group = document.querySelector('[data-name="group_id"]');
+                const groupSelection = group.nextElementSibling.querySelector(groupEvent.map(text => `[title*="${text}" i]`).join(", "));
+                if (groupSelection) group.click(); groupSelection.click();
 
                 const priority = document.querySelector('select[name="priority_id"]');
                 if (priority) importSimulator("1", priority);
@@ -556,7 +556,7 @@
         }
     }
 
-    function importSimulator(value, element) {
+    function importSimulator(value, element, CustomSelect = false) {
         element.dispatchEvent(new Event('focus', { bubbles: true })); // click vào
         element.value = value;
         element.dispatchEvent(new Event('input', { bubbles: true })); // gõ
