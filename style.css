@@ -10,11 +10,9 @@
     cursor: var(--pmtrung-cursor);
 }
 
-.pmtrung-screenshot-wrapper {
-    position: absolute;
-    left: -9999px;
-    top: 0;
-    background: inherit;
+.pmtrung-screenshot-wrapper .gridHeader{
+    white-space: nowrap !important; 
+    width: 100% !important;
 }
 
 .pmtrung-screenshot-wrapper .pmtrung-log-format,
