@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Ticket Creator (Beta)
 // @namespace    https://github.com/AZAOWEN2/Ticket-Creator
-// @version      1.0.4
+// @version      1.0.5
 // @description  Yesthing
 // @author       AZAOWEN
 // @icon         https://i.pinimg.com/736x/e9/f6/36/e9f63675fa85770c13c3d726f3313a37.jpg
@@ -342,8 +342,8 @@
                 8: `Destination IP: ${data.DestinationIP}
                     Username: ${additionalData.TargetUsername}
                     ${/^(10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/.test(data.SourceIP) ? "" : "Việc cho phép IP public RDP vào server tiềm ẩn rất nhiều rủi ro cho hệ thống."}`,
-                9: `File Path: ${additionalData.EvilFile == "" || additionalData.EvilFile == "N/A" ? `Chi tiết trong ảnh đính kèm` : `additionalData.EvilFile`}
-                    ${additionalData.Hash == "" || additionalData.Hash == "N/A" ? "": `Hash: ` + additionalData.Hash }`,
+                9: `File Path: ${additionalData.EvilFile == "" || additionalData.EvilFile == "N/A" ? "Chi tiết trong ảnh đính kèm" : additionalData.EvilFile}
+                    ${additionalData.Hash == "" || additionalData.Hash == "N/A" ? "": "Hash: " + additionalData.Hash }`,
                 "default": ``
             },
             p5: `Time: ${data.Time}`,
