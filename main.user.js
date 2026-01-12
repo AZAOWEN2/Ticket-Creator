@@ -494,7 +494,7 @@
             {
                 ids: ["4625", "SSHD_LOGIN_FAILED", "77001", "LOGIN_FAILED"],
                 type: 6, //Login Failed 
-                group: ["Access"]
+                group: ["Bruteforce"]
             },
             {
                 ids: ["4720"],
