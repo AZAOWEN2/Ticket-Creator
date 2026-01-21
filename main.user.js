@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Ticket Creator (Beta)
 // @namespace    https://github.com/AZAOWEN2/Ticket-Creator
-// @version      1.0.6
+// @version      1.0.7
 // @description  Yesthing
 // @author       AZAOWEN
 // @icon         https://i.pinimg.com/736x/e9/f6/36/e9f63675fa85770c13c3d726f3313a37.jpg
@@ -477,7 +477,7 @@
                 group: ["Suspicious Activity", "client_server", "Các sự cố liên quan đến máy Client và Server"]
             },
             {
-                ids: ["4697", "7045"],
+                ids: ["4697", "7045", "Service Control Manager_7045"],
                 type: 3, //Install Service
                 group: ["Suspicious Activity", "client_server", "Các sự cố liên quan đến máy Client và Server"]
             },
@@ -492,7 +492,7 @@
                 group: ["Access"]
             },
             {
-                ids: ["4625", "SSHD_LOGIN_FAILED", "77001", "LOGIN_FAILED"],
+                ids: ["4625", "SSHD_LOGIN_FAILED", "77001", "LOGIN_FAILED", "USER_AUTH_FAILED", "Authentication Failure", "USER_LOGIN_FAILED"],
                 type: 6, //Login Failed 
                 group: ["Bruteforce"]
             },
