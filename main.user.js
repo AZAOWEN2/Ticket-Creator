@@ -507,7 +507,7 @@
                 group: ["Access"]
             },
             {
-                ids: ["GNRL_EV_VIRUS_FOUND 61", "GNRL_EV_OBJECT_CURED", "GNRL_EV_VIRUS_FOUND 60", "GNRL_EV_VIRUS_FOUND 62", "GNRL_EV_VIRUS_FOUND", "GNRL_EV_VIRUS_FOUND_AND_BLOCKED", "GNRL_EV_OBJECT_DELETED", "GNRL_EV_OBJECT_BLOCKED"],
+                ids: ["GNRL_EV_VIRUS_FOUND 61", "GNRL_EV_OBJECT_CURED", "GNRL_EV_VIRUS_FOUND 60", "GNRL_EV_VIRUS_FOUND 62", "GNRL_EV_VIRUS_FOUND", "GNRL_EV_VIRUS_FOUND_AND_BLOCKED", "GNRL_EV_OBJECT_DELETED", "GNRL_EV_OBJECT_BLOCKED", "GNRL_EV_VIRUS_FOUND_BY_KSN"],
                 type: 9, //Malware/Ransomware
                 group: ["Malware"]
             },
